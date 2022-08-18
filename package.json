@@ -1,0 +1,15 @@
+{
+  "name": "three.js-typescript-tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/three": "^0.143.1",
+    "three": "^0.143.0"
+  }
+}
