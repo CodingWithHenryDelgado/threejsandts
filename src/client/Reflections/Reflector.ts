@@ -1,13 +1,20 @@
-// GLTF models exported with animations, often don't work with the DragControls, 
-// so one approach to solve the problem, is to create a secondary object, such as a cube, 
-// and bind the DragControls to that instead. Then adjudst the position of your model group to 
-// the new position of the cube being dragged.
+// The reflector object will mirror in one direction only.If you want to create an infinity mirror, 
+// you can place another Reflector in front of the existing Reflector, but placed some distance in front 
+// of it and facing back towards at the first Reflector.The Reflectors will only reflect what they see in the 
+// current Render pass.So you won't get the realistic infinity mirror effect at first. Since Reflectors, only 
+// Reflect in one direction, you can place another Reflector behind an Existing Reflector in series, and you 
+// will get a triple reflection in the other Reflector reflecting back at both the others placed in series. 
+// In the example above, I have 4 Reflectors, all looking at each other. 2 are 
+// looking forward and 2 are looking back. And are all at different distances. Note 
+// that creating an infinity mirror using this technique will will require more CPU for 
+// each new Reflector added to the scene.
 
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { DragControls } from 'three/examples/jsm/controls/DragControls'
+import { Reflector } from 'three/examples/jsm/objects/Reflector'
 
 const scene = new THREE.Scene()
 scene.add(new THREE.AxesHelper(5))
@@ -47,21 +54,17 @@ dragControls.addEventListener('hoveron', function () {
     boxHelper.visible = true
     orbitControls.enabled = false
 })
-
 dragControls.addEventListener('hoveroff', function () {
     boxHelper.visible = false
     orbitControls.enabled = true
 })
-
 dragControls.addEventListener('drag', function (event) {
     event.object.position.y = 0
 })
-
 dragControls.addEventListener('dragstart', function () {
     boxHelper.visible = true
     orbitControls.enabled = false
 })
-
 dragControls.addEventListener('dragend', function () {
     boxHelper.visible = false
     orbitControls.enabled = true
@@ -132,6 +135,60 @@ function onWindowResize() {
     render()
 }
 
+const mirrorBack1: Reflector = new Reflector(
+    new THREE.PlaneBufferGeometry(2, 2),
+    {
+        color: new THREE.Color(0x7f7f7f),
+        textureWidth: window.innerWidth * window.devicePixelRatio,
+        textureHeight: window.innerHeight * window.devicePixelRatio
+    }
+)
+
+mirrorBack1.position.y = 1
+mirrorBack1.position.z = -1
+scene.add(mirrorBack1)
+
+const mirrorBack2: Reflector = new Reflector(
+    new THREE.PlaneBufferGeometry(2, 2),
+    {
+        color: new THREE.Color(0x7f7f7f),
+        textureWidth: window.innerWidth * window.devicePixelRatio,
+        textureHeight: window.innerHeight * window.devicePixelRatio
+    }
+)
+
+mirrorBack2.position.y = 1
+mirrorBack2.position.z = -2
+scene.add(mirrorBack2)
+
+const mirrorFront1: Reflector = new Reflector(
+    new THREE.PlaneBufferGeometry(2, 2),
+    {
+        color: new THREE.Color(0x7f7f7f),
+        //clipBias: 0.003,
+        textureWidth: window.innerWidth * window.devicePixelRatio,
+        textureHeight: window.innerHeight * window.devicePixelRatio
+    }
+)
+mirrorFront1.position.y = 1
+mirrorFront1.position.z = 1
+mirrorFront1.rotateY(Math.PI)
+scene.add(mirrorFront1)
+
+const mirrorFront2: Reflector = new Reflector(
+    new THREE.PlaneBufferGeometry(2, 2),
+    {
+        color: new THREE.Color(0x7f7f7f),
+        //clipBias: 0.003,
+        textureWidth: window.innerWidth * window.devicePixelRatio,
+        textureHeight: window.innerHeight * window.devicePixelRatio
+    }
+)
+mirrorFront2.position.y = 1
+mirrorFront2.position.z = 2
+mirrorFront2.rotateY(Math.PI)
+scene.add(mirrorFront2)
+
 const stats = Stats()
 document.body.appendChild(stats.dom)
 
@@ -144,7 +201,7 @@ function animate() {
 
     if (modelReady) {
         mixer.update(clock.getDelta())
-        modelGroup.position.copy(modelDragBox.position)
+        // modelGroup.position.copy(modelDragBox.position)
         boxHelper.update()
     }
 

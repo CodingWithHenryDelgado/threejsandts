@@ -40,6 +40,7 @@ const cubes = [
     new THREE.Mesh(geometry, material[1]),
     new THREE.Mesh(geometry, material[2])
 ]
+
 cubes[0].position.x = -2
 cubes[1].position.x = 0
 cubes[2].position.x = 2
